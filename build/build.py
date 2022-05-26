@@ -509,6 +509,7 @@ def main():
   if args.enable_rocm:
     config_args += ["--config=rocm"]
     config_args += ["--config=nonccl"]
+    config_args += ["--config=dbg"]
 
   command = ([bazel_path] + args.bazel_startup_options +
     ["run", "--verbose_failures=true"] + config_args +
