@@ -117,6 +117,7 @@ def PRNGKey(seed: int) -> KeyArray:
     and ``fold_in``.
 
   """
+  print("PRNGKey!!")
   impl = _get_default_prng_impl()
   key = prng.seed_with_impl(impl, seed)
   return _return_prng_keys(True, key)

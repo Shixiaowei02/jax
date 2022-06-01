@@ -1545,6 +1545,7 @@ def _dot_general(lhs, rhs, *, dimension_numbers,
                  _in_avals: Sequence[core.ShapedArray],
                  _out_aval: core.ShapedArray):
   """Implementation of lax.dot_general_p in terms of tf.linalg.einsum."""
+  print("_dot_general here!!")
   (lhs_contracting, rhs_contracting), (lhs_batch, rhs_batch) = dimension_numbers
   dnums_proto = xla_data_pb2.DotDimensionNumbers()
   dnums_proto.lhs_contracting_dimensions.extend(lhs_contracting)

@@ -647,6 +647,7 @@ def _jit_lower(fun, static_argnums, static_argnames, device, backend,
     flat_fun, out_tree = flatten_fun(closed_fun, in_tree)
     name = flat_fun.__name__
     arg_specs = unsafe_map(arg_spec, args_flat)
+    print("flat_fun.__name__: ", name)
     computation = dispatch.lower_xla_callable(
         flat_fun, device, backend, name, donated_invars, *arg_specs)
     return Lowered(computation, in_tree, out_tree(), donate_argnums)

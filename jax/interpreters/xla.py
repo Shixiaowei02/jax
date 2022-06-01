@@ -761,6 +761,7 @@ def lower_jaxpr_to_xla_module(
     partitions_are_protos: bool = False
     ) -> xc.XlaComputation:
   """Lowers a closed jaxpr to a top-level XLA module."""
+  print("lower_jaxpr_to_xla_module, fn_name: ", fn_name, ", platform: ", platform)
   c = xc.XlaBuilder(fn_name)
   xla_consts = _xla_consts(c, jaxpr.consts)
   xla_args, donated_invars = _xla_callable_args(

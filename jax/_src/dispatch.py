@@ -99,6 +99,7 @@ xla.apply_primitive = apply_primitive
 
 @util.cache()
 def xla_primitive_callable(prim, *arg_specs: ArgSpec, **params):
+  print("xla_primitive_callable start: ", prim.name)
   avals, arg_devices = util.unzip2(arg_specs)
   donated_invars = (False,) * len(arg_specs)
   device = _device_from_arg_devices(arg_devices)
@@ -111,8 +112,10 @@ def xla_primitive_callable(prim, *arg_specs: ArgSpec, **params):
   compiled = _xla_callable_uncached(lu.wrap_init(prim_fun), device, None,
                                     prim.name, donated_invars, *arg_specs)
   if not prim.multiple_results:
+    print("xla_primitive_callable end: not multiple_results")
     return lambda *args, **kw: compiled(*args, **kw)[0]
   else:
+    print("xla_primitive_callable end: multiple_results")
     return compiled
 
 
@@ -139,6 +142,7 @@ def _device_from_arg_devices(devices: Sequence[Optional[Device]]) -> Optional[De
 def _xla_call_impl(fun: lu.WrappedFun, *args, device, backend, name,
                    donated_invars, inline):
   del inline  # Only used at tracing time
+  print("_xla_call_impl: ", name)
   compiled_fun = _xla_callable(fun, device, backend, name, donated_invars,
                                *unsafe_map(arg_spec, args))
   try:
@@ -166,6 +170,7 @@ xla.xla_call_p.def_impl(_xla_call_impl)
 
 def _xla_callable_uncached(fun: lu.WrappedFun, device, backend, name,
                            donated_invars, *arg_specs):
+  print("_xla_callable_uncached: ", name)
   return lower_xla_callable(fun, device, backend, name, donated_invars,
                             *arg_specs).compile().unsafe_call
 
@@ -187,6 +192,7 @@ def log_elapsed_time(fmt: str):
 @profiler.annotate_function
 def lower_xla_callable(fun: lu.WrappedFun, device, backend, name,
                        donated_invars, *arg_specs):
+  print("lower_xla_callable: ", fun.__name__)
   if device is not None and backend is not None:
     raise ValueError("can't specify both a device and a backend for jit, "
                      "got device={} and backend={}".format(device, backend))
@@ -532,6 +538,7 @@ class XlaComputation:
 def backend_compile(backend, built_c, options):
   # we use a separate function call to ensure that XLA compilation appears
   # separately in Python profiling results
+  print("backend.compile here!")
   return backend.compile(built_c, compile_options=options)
 
 # TODO(phawkins): update users.
@@ -608,6 +615,7 @@ class XlaCompiledComputation:
     options.parameter_is_tupled_arguments = tuple_args
     with log_elapsed_time(f"Finished XLA compilation of {name} "
                           "in {elapsed_time} sec"):
+      print("compile_or_get_cached here!")
       compiled = compile_or_get_cached(backend, xla_computation, options)
     buffer_counts = (None if len(out_avals) == 1 else
                      [aval_to_num_buffers(aval) for aval in out_avals])
